@@ -1,0 +1,170 @@
+html {
+	-ms-text-size-adjust:100%;
+	-webkit-text-size-adjust:100%;
+	font-size:62.5%;
+}
+* {
+  	-webkit-box-sizing: border-box;
+  	-moz-box-sizing: border-box;
+  	box-sizing: border-box;
+  	margin: 0;
+  	padding: 0;
+}
+.md-mask{
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background: rgba(0,0,0,0.3);
+	z-index: 10000;
+}
+.md-holder{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 340px;
+	z-index: 10001;
+	background: #f6f6f6;
+}
+.md-head{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 70px;
+}
+.md-title{
+	width: 100%;
+	height: 50px;
+	line-height: 50px;
+	color: #222;
+	font-size: 16px;
+	text-align: center;
+	font-weight: bold;
+}
+.md-selected{
+	width: 100%;
+	height: 20px;
+	line-height: 20px;
+	color: #444;
+	font-size: 12px;
+	text-align: center;
+}
+.md-body{
+	position: absolute;
+	top: 70px;
+	left: 0;
+	width: 100%;
+	height: 200px;
+	padding: 0 10px;
+}
+.md-table{
+	position: relative;
+	width: 100%;
+	height: 200px;
+	border: 1px solid #ccc;
+	border-left:none; 
+}
+.md-row-spline{
+	position: absolute;
+	width: 100%;
+	height: 1px;
+	overflow: hidden;
+	top: 80px;
+	left:0;
+	background: #ccc;
+	z-index: 10;
+}
+.md-row-spline-1{
+	top: 120px;
+}
+.md-middle{
+	position: absolute;
+	width: 100%;
+	height: 40px;
+	top: 80px;
+	left:0;
+	background: #fff;
+	z-index: 1;
+	border-left: 1px solid #ccc;
+}
+.md-col{
+	float: left;
+	width: 33.3333333333%;
+	height: 100%;
+	border-left:1px solid #ccc; 
+	overflow: hidden;
+	position: relative;
+}
+.md-col-holder{
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	z-index: 2;
+}
+.md-row{
+	width: 100%;
+	height: 40px;
+	text-align: center;
+	line-height: 40px;
+	font-size: 14px;
+	color: #222;
+}
+
+.md-row-2{
+	color: #ddd;
+}
+.md-row-1{
+	color: #999;
+}
+.md-row-0{
+	color: #F9A5A5;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	background: #fff;
+}
+
+.md-foot{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 70px;
+}
+.md-buttons{
+	float: left;
+	width: 100%;
+	padding: 0 20px;
+	margin-top: 20px;
+}
+
+.md-btn{
+	font-size: 14px;
+	padding: 10px 30px;
+	border: 1px solid #ccc;
+	width: 50%;
+	float: left;
+	text-align: center;
+	background: #fff;
+	color: #222;
+}
+.md-btn-left{
+	border-bottom-left-radius: 15px;
+	border-top-left-radius: 15px;
+}
+.md-btn-right{
+	margin-left: -1px;
+	border-bottom-right-radius: 15px;
+	border-top-right-radius: 15px;
+}
+
+
+
+
+
+
+

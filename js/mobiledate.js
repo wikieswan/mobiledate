@@ -63,40 +63,55 @@ $(function(){
 		
 	})
 	$('.md-col-holder').on('touchend',function(e){
-		var _year ,
-			_month ,
-			_day ;
+		var days ;
 		var yEnd = $(this).css('top');
 		yEnd = px2number(yEnd)
-		var y = Math.round(yEnd/40)*40;
-
 
 		if($(this).hasClass('md-year')){
+			var y = Math.round(yEnd/40)*40;
 			$(this).animate({top:y},300,'ease')
-			getDay()
+			reInitDay();
 		}
 		else if($(this).hasClass('md-month')){
 			
 			var index = Math.round(yEnd/40)
-			var month =  -((index-3)%12) ;
-			$(this).css('top',-(12+month-3)*40);
-
-			_year = getYear();
-			_month = getMonth();
-			initDay(_day,_month,_year);
-			return false;
+			setTouchendCyclePosition(index,12,this)	
+			reInitDay();
 		}
 		else if($(this).hasClass('md-day')){
 			
-			var _year = getYear(),
-				_month = getMonth();
+			_year = getYear();
+			_month = getMonth();
+			
+			days = daysInMonth(_month,_year);
 
-				
+			var index = Math.round(yEnd/40)
+
+			setTouchendCyclePosition(index,days,this)	
 			return false;
 		}
 		
 
 	})
+
+	function reInitDay(){
+		var _year ,
+			_month ,
+			_day;
+		_year = getYear();
+		_month = getMonth();
+		_day = getDay();
+		days = daysInMonth(_month,_year);
+		if(_day>days){
+			_day = days
+		}
+		initDay(_day,_month,_year);
+	}
+
+	function setTouchendCyclePosition(index,cycleLen,dom){
+		var indexVal =  -((index-3)%cycleLen) ;
+		$(dom).css('top',-(cycleLen+indexVal-3)*40);
+	}
 
 	function touchmove(clientXmove,clientYmove,clientXstart,clientYstart,target){
 		var x = clientXmove - clientXstart,
@@ -124,6 +139,14 @@ $(function(){
 		y0 = px2number(y0)
 		var ymove = y0+y/10;
 		$(target).css('top',ymove)
+	}
+
+	function moveTargetStyle(target,y){
+
+	}
+
+	function mobileDateStyleInit(){
+
 	}
 	
 	
@@ -176,6 +199,7 @@ $(function(){
 		}
 		$('.md-year').css('top',(1970-year+2)*40);
 		$('.md-year').html(yearHtml);
+		initYearStyle();
 	}
 	function initMonth(month){
 		if(typeof month==='undefined'){
@@ -226,12 +250,47 @@ $(function(){
 	function daysInMonth(month,year) {
 	    return new Date(year, month, 0).getDate();
 	}
+	function initYearStyle(){
+		var y = $('.md-year').css('top');
+		y = - px2number(y);
+		var index = y/40 + 2;
+		var $rows = $('.md-year').find('.md-row');
+		cleanStyle('.md-year')
+		$($rows[index]).addClass('md-row-0');
+
+		if(index-1>0){
+			$($rows[index-1]).addClass('md-row-1');
+		}
+		if(index-2>0){
+			$($rows[index-2]).addClass('md-row-2');
+		}
+		$($rows[index+1]).addClass('md-row-1');
+		$($rows[index+2]).addClass('md-row-2');
+
+	}
+	function initMonthStyle(){
+
+	}
+	function initDayStyle(){
+
+	}
+	function initCycleStyle(dateValue,cycleLen){
+
+	}
+
+	function cleanStyle(dom,index){
+		if(typeof index==='undefined'){
+			$(dom).find('.md-row').removeClass('md-row-0').removeClass('md-row-1').removeClass('md-row-2')
+		}
+		else{
+			$($(dom).find('.md-row')[index]).removeClass('md-row-0').removeClass('md-row-1').removeClass('md-row-2')
+		}
+	}
 
 	function getYear(){
 		var y = $('.md-year').css('top');
 		y = - px2number(y);
 		var year = y/40 + 2 + 1970;
-		console.log(y,year)
 		return year;
 	}
 	function getMonth(){
@@ -250,7 +309,6 @@ $(function(){
 		var days = $('.md-day').find('.md-row').length/3;
 		var day = -((index-3)%days)
 		day = day===0?days:day;
-		console.log(y,days,day)
 		return day;
 	}
 

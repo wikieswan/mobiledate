@@ -122,10 +122,8 @@ html {
 	color: #999;
 }
 .md-row-0{
-	color: #F9A5A5;
-	border-top: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
-	background: #fff;
+	color: #f00;
+	font-size: 16px;
 }
 
 .md-foot{

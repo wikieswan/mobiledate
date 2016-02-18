@@ -77,6 +77,7 @@ $(function(){
 			var index = Math.round(yEnd/40)
 			setTouchendCyclePosition(index,12,this)	
 			reInitDay();
+			initMonthStyle()
 		}
 		else if($(this).hasClass('md-day')){
 			
@@ -87,7 +88,8 @@ $(function(){
 
 			var index = Math.round(yEnd/40)
 
-			setTouchendCyclePosition(index,days,this)	
+			setTouchendCyclePosition(index,days,this)
+			initDayStyle()	
 			return false;
 		}
 		
@@ -106,6 +108,7 @@ $(function(){
 			_day = days
 		}
 		initDay(_day,_month,_year);
+
 	}
 
 	function setTouchendCyclePosition(index,cycleLen,dom){
@@ -133,21 +136,22 @@ $(function(){
 		if(ymove<=80 && ymove>=(3-rowLen)*40){
 			$(target).css('top',ymove)
 		}
+		initYearStyle()
 	}
 	function moveTarget(target,y){
 		var y0 = $(target).css('top');
 		y0 = px2number(y0)
 		var ymove = y0+y/10;
 		$(target).css('top',ymove)
+		if($(target).hasClass('md-month')){
+			initMonthStyle()
+		}
+		else{
+			initDayStyle()
+		}
 	}
 
-	function moveTargetStyle(target,y){
-
-	}
-
-	function mobileDateStyleInit(){
-
-	}
+	
 	
 	
 	mobileDateInit(18,2,2016);
@@ -215,6 +219,7 @@ $(function(){
 		
 		$('.md-month').css('top',(3-month-12)*40);
 		$('.md-month').html(monthHtml);
+		initMonthStyle(month);
 	}
 	function number2Str(num){
 		if(num<10){
@@ -244,6 +249,7 @@ $(function(){
 		}
 		$('.md-day').css('top',(3-day-days)*40);
 		$('.md-day').html(dayHtml);
+		initDayStyle(days);
 	}
 
 	//Month is 1 based
@@ -253,7 +259,7 @@ $(function(){
 	function initYearStyle(){
 		var y = $('.md-year').css('top');
 		y = - px2number(y);
-		var index = y/40 + 2;
+		var index = Math.round(y/40)  + 2;
 		var $rows = $('.md-year').find('.md-row');
 		cleanStyle('.md-year')
 		$($rows[index]).addClass('md-row-0');
@@ -269,13 +275,31 @@ $(function(){
 
 	}
 	function initMonthStyle(){
-
+		initCycleStyle(12,'.md-month')
 	}
 	function initDayStyle(){
+		var _year ,
+			_month ,
+			_day;
+		_year = getYear();
+		_month = getMonth();
+		_day = getDay();
+		days = daysInMonth(_month,_year);
 
+		initCycleStyle(days,'.md-day')
 	}
-	function initCycleStyle(dateValue,cycleLen){
-
+	function initCycleStyle(cycleLen,dom){
+		var y = $(dom).css('top');
+		y =  px2number(y);
+		var dateValue = 3 - Math.round(y/40) - cycleLen;
+		cleanStyle(dom)
+		var index = dateValue + cycleLen - 1;
+		var $rows = $(dom).find('.md-row');
+		$($rows[index]).addClass('md-row-0');
+		$($rows[index-1]).addClass('md-row-1');
+		$($rows[index-2]).addClass('md-row-2');
+		$($rows[index+1]).addClass('md-row-1');
+		$($rows[index+2]).addClass('md-row-2');
 	}
 
 	function cleanStyle(dom,index){

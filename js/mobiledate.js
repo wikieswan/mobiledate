@@ -102,7 +102,7 @@ $(function(){
 		closeMobiledate();
 	})
 	$('body').on('touchend','.md-sure',function(){
-		closeMobiledate()
+		closeMobiledate();
 	})
 
 	function closeMobiledate(){

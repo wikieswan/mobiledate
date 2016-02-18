@@ -27,6 +27,7 @@ $(function(){
 		xStartDay , yStartDay;
 
 	var UNITHEIGHT = 40;
+	var DAYS;
 	
 	$('.md-col-holder').on('touchstart',function(e){
 		var touch = e.changedTouches[0]
@@ -62,39 +63,72 @@ $(function(){
 		
 	})
 	$('.md-col-holder').on('touchend',function(e){
-		
+		var _year ,
+			_month ,
+			_day ;
 		var yEnd = $(this).css('top');
-		console.log(yEnd)
 		yEnd = px2number(yEnd)
 		var y = Math.round(yEnd/40)*40;
-		$(this).animate({top:y},300,'ease')
+
+
+		if($(this).hasClass('md-year')){
+			$(this).animate({top:y},300,'ease')
+			getDay()
+		}
+		else if($(this).hasClass('md-month')){
+			
+			var index = Math.round(yEnd/40)
+			var month =  -((index-3)%12) ;
+			$(this).css('top',-(12+month-3)*40);
+
+			_year = getYear();
+			_month = getMonth();
+			initDay(_day,_month,_year);
+			return false;
+		}
+		else if($(this).hasClass('md-day')){
+			
+			var _year = getYear(),
+				_month = getMonth();
+
+				
+			return false;
+		}
+		
 
 	})
 
 	function touchmove(clientXmove,clientYmove,clientXstart,clientYstart,target){
 		var x = clientXmove - clientXstart,
 			y = clientYmove - clientYstart;
-		moveTarget(target,y)
+		
+		if($(target).hasClass('md-year')){
+			moveTargetYear(target,y)
+		}
+		else{
+			moveTarget(target,y)
+		}
 
 	}
-	function moveTarget(target,y){
-
+	function moveTargetYear(target,y){
 		var rowLen = $(target).find('.md-row').length;
 		var y0 = $(target).css('top');
-		console.log($(target),target)
 		y0 = px2number(y0)
 		var ymove = y0+y/10;
 		if(ymove<=80 && ymove>=(3-rowLen)*40){
 			$(target).css('top',ymove)
 		}
-
-		
 	}
-	function px2number(strpx){
-		var numstr = strpx.replace(/px/,'');
-		return numstr*1;
+	function moveTarget(target,y){
+		var y0 = $(target).css('top');
+		y0 = px2number(y0)
+		var ymove = y0+y/10;
+		$(target).css('top',ymove)
 	}
-	mobileDateInit(30,12,2016);
+	
+	
+	mobileDateInit(18,2,2016);
+	
 	function mobileDateInit(day,month,year){
 		if(typeof day==='undefined'){
 			day = new Date().format('dd')
@@ -119,13 +153,14 @@ $(function(){
 			return false;
 		}
 		var days = daysInMonth(month,year);
+		DAYS = days;
 		if(day<1||day>days){
 			console.error('day must between 1 and '+days)
 			return false;
 		}
 		initYear(year);
 		initMonth(month);
-		initDay(day);
+		initDay(day,month,year);
 	}
 
 	
@@ -148,10 +183,13 @@ $(function(){
 		}
 		month = month*1;
 		var monthHtml = '';
-		for(var i=1;i<13;i++){
-			monthHtml += '<div class="md-row">'+ number2Str(i) +'</div>'
+		for(var n=0;n<3;n++){
+			for(var i=1;i<13;i++){
+				monthHtml += '<div class="md-row">'+ number2Str(i) +'</div>'
+			}
 		}
-		$('.md-month').css('top',(3-month)*40);
+		
+		$('.md-month').css('top',(3-month-12)*40);
 		$('.md-month').html(monthHtml);
 	}
 	function number2Str(num){
@@ -175,10 +213,12 @@ $(function(){
 		year = year*1;
 		var days = daysInMonth(month,year);
 		var dayHtml = ''
-		for(var i=1;i<=days;i++){
-			dayHtml += '<div class="md-row">'+ number2Str(i) +'</div>'
+		for(var n=0;n<3;n++){
+			for(var i=1;i<=days;i++){
+				dayHtml += '<div class="md-row">'+ number2Str(i) +'</div>'
+			}
 		}
-		$('.md-day').css('top',(3-day)*40);
+		$('.md-day').css('top',(3-day-days)*40);
 		$('.md-day').html(dayHtml);
 	}
 
@@ -187,6 +227,32 @@ $(function(){
 	    return new Date(year, month, 0).getDate();
 	}
 
+	function getYear(){
+		var y = $('.md-year').css('top');
+		y = - px2number(y);
+		var year = y/40 + 2 + 1970;
+		console.log(y,year)
+		return year;
+	}
+	function getMonth(){
+		var y = $('.md-month').css('top');
+		y = px2number(y);
+		var index = y/40
+		var month =  -((index-3)%12) ;
+		month = month===0?12:month
+		return month;
+	}
+
+	function getDay(){
+		var y = $('.md-day').css('top');
+		y = px2number(y);
+		var index = y/40;
+		var days = $('.md-day').find('.md-row').length/3;
+		var day = -((index-3)%days)
+		day = day===0?days:day;
+		console.log(y,days,day)
+		return day;
+	}
 
 
 
@@ -194,7 +260,10 @@ $(function(){
 
 
 
-
+	function px2number(strpx){
+		var numstr = strpx.replace(/px/,'');
+		return numstr*1;
+	}
 
 	
 	

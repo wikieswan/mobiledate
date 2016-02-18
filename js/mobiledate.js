@@ -27,9 +27,8 @@ $(function(){
 		xStartDay , yStartDay;
 
 	var UNITHEIGHT = 40;
-	var DAYS;
 	
-	$('.md-col-holder').on('touchstart',function(e){
+	$('body').on('touchstart','.md-col-holder',function(e){
 		var touch = e.changedTouches[0]
 		clientXstart = touch.clientX;
 		clientYstart = touch.clientY;
@@ -46,7 +45,7 @@ $(function(){
 			yStartDay = touch.clientY;
 		}
 	})
-	$('.md-col-holder').on('touchmove',function(e){
+	$('body').on('touchmove','.md-col-holder',function(e){
 		var touch = e.changedTouches[0]
 		var clientXmove = touch.clientX;
 		var clientYmove = touch.clientY;
@@ -62,7 +61,7 @@ $(function(){
 		}
 		
 	})
-	$('.md-col-holder').on('touchend',function(e){
+	$('body').on('touchend','.md-col-holder',function(e){
 		var days ;
 		var yEnd = $(this).css('top');
 		yEnd = px2number(yEnd)
@@ -71,6 +70,7 @@ $(function(){
 			var y = Math.round(yEnd/40)*40;
 			$(this).animate({top:y},300,'ease')
 			reInitDay();
+			$('.md-selected-year').html(getYear())
 		}
 		else if($(this).hasClass('md-month')){
 			
@@ -78,6 +78,7 @@ $(function(){
 			setTouchendCyclePosition(index,12,this)	
 			reInitDay();
 			initMonthStyle()
+			$('.md-selected-month').html(getMonth())
 		}
 		else if($(this).hasClass('md-day')){
 			
@@ -90,11 +91,46 @@ $(function(){
 
 			setTouchendCyclePosition(index,days,this)
 			initDayStyle()	
+			$('.md-selected-day').html(getDay())
 			return false;
 		}
-		
+		setWeekDay()
 
 	})
+
+	$('body').on('touchend','.md-cancel',function(){
+		closeMobiledate();
+	})
+	$('body').on('touchend','.md-sure',function(){
+		closeMobiledate()
+	})
+
+	function closeMobiledate(){
+		$('.md-mask').animate({
+			'background': 'rgba(0,0,0,0)'
+		},300,'ease',function(){
+			$('.md-holder').hide();
+		})
+		
+	}
+
+	function setWeekDay(){
+		var year ,
+			month ,
+			day;
+		year = getYear();
+		month = getMonth();
+		day = getDay();
+
+		var date = new Date(year+'/'+month+'/'+day)
+		var weekIndex = date.getDay();
+		var weeks = {
+			'zh-CN': ['星期天','星期一','星期二','星期三','星期四','星期五','星期六'],
+			'en':['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+		}
+		var weekday =  weeks['zh-CN'][weekIndex];
+		$('.md-selected-weekday').html(weekday)
+	}
 
 	function reInitDay(){
 		var _year ,
@@ -180,7 +216,6 @@ $(function(){
 			return false;
 		}
 		var days = daysInMonth(month,year);
-		DAYS = days;
 		if(day<1||day>days){
 			console.error('day must between 1 and '+days)
 			return false;
@@ -188,6 +223,10 @@ $(function(){
 		initYear(year);
 		initMonth(month);
 		initDay(day,month,year);
+		$('.md-selected-year').html(getYear())
+		$('.md-selected-month').html(getMonth())
+		$('.md-selected-day').html(getDay())
+		setWeekDay()
 	}
 
 	

@@ -20,57 +20,98 @@ $(function(){
 						: ("00" + o[k]).substr(("" + o[k]).length));
 		return format;
 	};
+	var util = {};
+	util.px2number = px2number;
+	util.number2Str = number2Str;
+	util.daysInMonth = daysInMonth;
+	util.cleanStyle = cleanStyle;
+	util.weeks = {
+			'zh-CN': ['星期天','星期一','星期二','星期三','星期四','星期五','星期六'],
+			'en':['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+		}
 
 	var clientXstart , clientYstart;
-	var xStartYear , yStartYear,
-		xStartMonth , yStartMonth,
-		xStartDay , yStartDay;
-
+	var  yStartYear,
+		 yStartMonth,
+		 yStartDay,
+		 yStartHour,
+		 yStartMin;
+	var yearTimeStampStart,
+		yearTimeStampEnd;
 	var UNITHEIGHT = 40;
 	
+	//touch start
 	$('body').on('touchstart','.md-col-holder',function(e){
+		console.log(e)
+		yearTimeStampStart = e.timeStamp;
 		var touch = e.changedTouches[0]
-		clientXstart = touch.clientX;
 		clientYstart = touch.clientY;
 		if($(this).hasClass('md-year')){
-			xStartYear = touch.clientX;
 			yStartYear = touch.clientY;
 		}
 		else if($(this).hasClass('md-month')){
-			xStartMonth = touch.clientX;
 			yStartMonth = touch.clientY;
 		}
 		else if($(this).hasClass('md-day')){
-			xStartDay = touch.clientX;
 			yStartDay = touch.clientY;
 		}
+
 	})
+
+	//touch move
 	$('body').on('touchmove','.md-col-holder',function(e){
+		console.log(e)
 		var touch = e.changedTouches[0]
-		var clientXmove = touch.clientX;
-		var clientYmove = touch.clientY;
+		var ymove = touch.clientY;
 
 		if($(this).hasClass('md-year')){
-			touchmove(clientXmove,clientYmove,xStartYear,yStartYear,'.md-year')
+			//touchmove(ymove,yStartYear,'.md-year')
+			moveEngine(ymove,yStartYear,'.md-year')
 		}
 		else if($(this).hasClass('md-month')){
-			touchmove(clientXmove,clientYmove,xStartMonth,yStartMonth,'.md-month')
+			touchmove(ymove,yStartMonth,'.md-month')
 		}
 		else if($(this).hasClass('md-day')){
-			touchmove(clientXmove,clientYmove,xStartDay,yStartDay,'.md-day')
+			touchmove(ymove,yStartDay,'.md-day')
 		}
 		
 	})
+
+	//touch end
 	$('body').on('touchend','.md-col-holder',function(e){
+		var timeStampEnd = e.timeStamp;
+		var touch = e.changedTouches[0]
+		var ymove = touch.clientY;
+		
+
+		var t = timeStampEnd-yearTimeStampStart
+		var s = ymove-yStartYear
+		var v = s/t;
+		var ymoveEnd;
+
+		console.log(s,t,s/t)
+		if(t<300){
+			ymoveEnd  = v * 300;
+		}
+		else{
+			ymoveEnd  = 0;
+		}
+
+
+
 		var days ;
 		var yEnd = $(this).css('top');
-		yEnd = px2number(yEnd)
+		yEnd = px2number(yEnd) + ymoveEnd
 
 		if($(this).hasClass('md-year')){
 			var y = Math.round(yEnd/40)*40;
-			$(this).animate({top:y},300,'ease')
+			$(this).animate({top:y},300,'ease',function(){
+				console.log(1)
+				straightMoveStyle('.md-year');
+			})
 			reInitDay();
 			$('.md-selected-year').html(getYear())
+			
 		}
 		else if($(this).hasClass('md-month')){
 			
@@ -152,9 +193,39 @@ $(function(){
 		$(dom).css('top',-(cycleLen+indexVal-3)*40);
 	}
 
-	function touchmove(clientXmove,clientYmove,clientXstart,clientYstart,target){
-		var x = clientXmove - clientXstart,
-			y = clientYmove - clientYstart;
+	// move engine
+	function moveEngine(clientYmove,clientYstart,target){
+		console.log(clientYmove,clientYstart)
+		var y = clientYmove - clientYstart;
+		// straight move engine
+		if($(target).hasClass('md-straight')){
+			straightMoveEngine(target,y)
+		}
+		// cycle move engine
+		else if($(target).hasClass('md-cycle')){
+			cycleMoveEngin(target,y)
+		}
+	}
+	function straightMoveEngine(target,y){
+		
+		var yAbs = Math.abs(y)
+		var slowDownTimes = 10;
+		var rowLen = $(target).find('.md-row').length;
+		var y0 = $(target).css('top');
+		y0 = util.px2number(y0)
+		var ymove = y0+y/slowDownTimes;
+		if(ymove<=2*UNITHEIGHT && ymove>=(3-rowLen)*UNITHEIGHT){
+			//$(target).css('top',ymove)
+			$(target).animate({'top':ymove},100,'ease')
+		}
+		straightMoveStyle(target);
+	}
+	function cycleMoveEngine(target,y){
+		
+	}
+
+	function touchmove(clientYmove,clientYstart,target){
+		var y = clientYmove - clientYstart;
 		
 		if($(target).hasClass('md-year')){
 			moveTargetYear(target,y)
@@ -260,12 +331,7 @@ $(function(){
 		$('.md-month').html(monthHtml);
 		initMonthStyle(month);
 	}
-	function number2Str(num){
-		if(num<10){
-			num = '0'+num
-		}
-		return num;
-	}
+	
 	function initDay(day,month,year){
 		if(typeof year==='undefined'){
 			year = new Date().format('yyyy')
@@ -291,10 +357,29 @@ $(function(){
 		initDayStyle(days);
 	}
 
-	//Month is 1 based
-	function daysInMonth(month,year) {
-	    return new Date(year, month, 0).getDate();
+	function straightMoveStyle(target){
+		var y = $(target).css('top');
+		y = - px2number(y);
+		var index = Math.round(y/40)  + 2;
+		var $rows = $(target).find('.md-row');
+
+		//clear all target`s .md-row style
+		util.cleanStyle(target)
+		
+
+		//add style in the correct .md-row
+		$($rows[index]).addClass('md-row-0');
+		if(index-1>0){
+			$($rows[index-1]).addClass('md-row-1');
+		}
+		if(index-2>0){
+			$($rows[index-2]).addClass('md-row-2');
+		}
+		$($rows[index+1]).addClass('md-row-1');
+		$($rows[index+2]).addClass('md-row-2');
+
 	}
+	
 	function initYearStyle(){
 		var y = $('.md-year').css('top');
 		y = - px2number(y);
@@ -341,14 +426,7 @@ $(function(){
 		$($rows[index+2]).addClass('md-row-2');
 	}
 
-	function cleanStyle(dom,index){
-		if(typeof index==='undefined'){
-			$(dom).find('.md-row').removeClass('md-row-0').removeClass('md-row-1').removeClass('md-row-2')
-		}
-		else{
-			$($(dom).find('.md-row')[index]).removeClass('md-row-0').removeClass('md-row-1').removeClass('md-row-2')
-		}
-	}
+	
 
 	function getYear(){
 		var y = $('.md-year').css('top');
@@ -385,8 +463,24 @@ $(function(){
 		var numstr = strpx.replace(/px/,'');
 		return numstr*1;
 	}
-
-	
+	function number2Str(num){
+		if(num<10){
+			num = '0'+num
+		}
+		return num;
+	}
+	//Month is 1 based
+	function daysInMonth(month,year) {
+	    return new Date(year, month, 0).getDate();
+	}
+	function cleanStyle(dom,index){
+		if(typeof index==='undefined'){
+			$(dom).find('.md-row').removeClass('md-row-0').removeClass('md-row-1').removeClass('md-row-2')
+		}
+		else{
+			$($(dom).find('.md-row')[index]).removeClass('md-row-0').removeClass('md-row-1').removeClass('md-row-2')
+		}
+	}
 	
 
 })

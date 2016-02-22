@@ -80,6 +80,10 @@ $(function(){
 			yHourStart = touch.clientY;
 			timeHourStart = e.timeStamp;
 		}
+		else if(hasClass(this,'md-min')){
+			yMinStart = touch.clientY;
+			timeMinStart = e.timeStamp;
+		}
 	})
 	$('body').on('touchmove','.md-col-mask',function(e){
 		var touch = e.changedTouches[0]
@@ -97,6 +101,9 @@ $(function(){
 		}
 		else if(hasClass(this,'md-hour')){
 			touchMoveSlide('.md-hour',yMove-yHourStart)
+		}
+		else if(hasClass(this,'md-min')){
+			touchMoveSlide('.md-min',yMove-yMinStart)
 		}
 	})
 	$('body').on('touchend','.md-col-mask',function(e){
@@ -141,6 +148,12 @@ $(function(){
 			sMinus = touchEndMinusLength(timeEnd,timeHourStart,yEnd,yHourStart)
 			y0 = y0 + sMinus;
 			touchEndSlideCycle('.md-hour',y0,24);
+		}
+		else if(hasClass(this,'md-min')){
+			y0 = getTargetTopNumber('.md-min')
+			sMinus = touchEndMinusLength(timeEnd,timeMinStart,yEnd,yMinStart)
+			y0 = y0 + sMinus;
+			touchEndSlideCycle('.md-min',y0,60);
 		}
 
 	})
@@ -241,6 +254,7 @@ $(function(){
 	initMonth()
 	initDay()
 	initHour()
+	initMin()
 	function initYear(year){
 		if(typeof year==='undefined'){
 			year = new Date().format('yyyy')
@@ -262,36 +276,16 @@ $(function(){
 	function initMonth(month){
 		if(typeof month==="undefined"){
 			month = new Date().format('MM')
-			month = month*1;
 		}
-		var monthHtml = '',positoin;
-
-		for(var n=0;n<3;n++){
-			for(var i=0;i<12;i++){
-				monthHtml += '<div class="md-item">' + util.number2Str(i+1) +'</div>'
-			}
-		}
-		positoin = month
-		$('.md-month').html(monthHtml);
-		$('.md-month').css('top',(4-month-12)*40);
-		$('.md-month').attr('val',month)
+		initCycle('.md-month',month,12,1)
 	}
 	function reInitDay(){
-		
 		var day = getDay(),
 			month = getMonth(),
 			year = getYear();
-		console.log(day)	
 		var days = util.daysInMonth(month,year);
-		var dayHtml = ''
-		for(var n=0;n<3;n++){
-			for(var i=1;i<=days;i++){
-				dayHtml += '<div class="md-item">'+ util.number2Str(i) +'</div>'
-			}
-		}
-		$('.md-day').css('top',(4-day-days)*40);
-		$('.md-day').html(dayHtml);
-
+		
+		initCycle('.md-day',day,days)
 	}
 	
 	function initDay(day,month,year){
@@ -308,35 +302,34 @@ $(function(){
 		month = month*1;
 		year = year*1;
 		var days = util.daysInMonth(month,year);
-		var dayHtml = ''
-		for(var n=0;n<3;n++){
-			for(var i=1;i<=days;i++){
-				dayHtml += '<div class="md-item">'+ util.number2Str(i) +'</div>'
-			}
-		}
-		$('.md-day').css('top',(4-day-days)*40);
-		$('.md-day').html(dayHtml);
-		$('.md-day').attr(day);
+		initCycle('.md-day',day,days)
 	}
 	function initHour(hour){
 		if(typeof hour==='undefined'){
 			hour = new Date().format('hh')
 		}
-		hour = hour * 1;
-		var hourHtml = '';
-		for(var n=0;n<3;n++){
-			for(var i=0;i<24;i++){
-				hourHtml += '<div class="md-item">'+ util.number2Str(i) +'</div>'
-			}
-		}
-		$('.md-hour').css('top',(4-hour-24)*40);
-		$('.md-hour').html(hourHtml);
-		$('.md-hour').attr(hour);
+		initCycle('.md-hour',hour,24)
 	}
 
+	function initMin(min){
+		if(typeof hour==='undefined'){
+			min = new Date().format('mm')
+		}
+		initCycle('.md-min',min,60)
+	}
 
-
-
+	function initCycle(targetHolder,value,cycleLen){
+		value = value * 1;
+		var html = '';
+		for(var n=0;n<3;n++){
+			for(var i=0;i<cycleLen;i++){
+				html += '<div class="md-item">'+ util.number2Str(i) +'</div>'
+			}
+		}
+		$(targetHolder).css('top',(3-value-cycleLen)*40);
+		$(targetHolder).html(html);
+		$(targetHolder).attr(value);
+	}
 
 	function yPoitoin2Year(y){
 		y = -1 * y;
@@ -349,8 +342,6 @@ $(function(){
 			index = -(n-4)%cycleLen;
 		return index;
 	}
-	
-
 	function getYear(){
 		return getVal('.md-year');
 	}
@@ -359,6 +350,9 @@ $(function(){
 	}
 	function getDay(){
 		return getVal('.md-day');
+	}
+	function getHour(){
+		return getVal('.md-hour');
 	}
 	function getVal(target){
 		return $(target).attr('val')*1;

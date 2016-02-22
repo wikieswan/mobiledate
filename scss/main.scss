@@ -1,12 +1,4 @@
 
-* {
-  	-webkit-box-sizing: border-box;
-  	-moz-box-sizing: border-box;
-  	box-sizing: border-box;
-  	margin: 0;
-  	padding: 0;
-}
-
 .md-overlayer{
 	position: fixed;
 	top: 0;
@@ -22,7 +14,7 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	height: 340px;
+	height: 360px;
 	z-index: 1;
 	background: #fff;
 }
@@ -32,14 +24,16 @@
 	left: 0;
 	width: 100%;
 	height: 50px;
+	padding:0 10px;
+	box-sizing: border-box;
 	border-bottom: 1px solid #ccc;	
 	.md-btn{
 		height: 100%;
 		line-height: 50px;
-		font-size: 20px;
+		font-size: 18px;
 		color: #81d4fa;
 		padding:0 10px;	
-
+		box-sizing: border-box;
 	}
 	.md-cancel{
 		float: left;
@@ -48,36 +42,37 @@
 		float: right;
 	}
 }
-
+.md-col{
+	position: relative;
+	float: left;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+.md-col-1{
+	width: 100%;
+}
+.md-col-2{
+	width: 50%;
+}
+.md-col-3{
+	width: 33.33333333333%;
+}
+.md-col-4{
+	width: 25%;
+}
+.md-col-5{
+	width: 20%;
+}
 .md-body{
 	position: absolute;
-	top: 60px;
+	top: 70px;
 	left: 0;
 	width: 100%;
 	height: 280px;
 	padding: 0 10px;
-	.md-col{
-		position: relative;
-		float: left;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
-	}
-	.md-col-1{
-		width: 100%;
-	}
-	.md-col-2{
-		width: 50%;
-	}
-	.md-col-3{
-		width: 33.33333333333%;
-	}
-	.md-col-4{
-		width: 25%;
-	}
-	.md-col-5{
-		width: 20%;
-	}
+	box-sizing: border-box;
+	
 	.md-col-mask{
 		position: absolute;
 		top: 0;
@@ -98,6 +93,7 @@
 		height: 40px;
 		border-top: 1px solid #ccc;
 		border-bottom: 1px solid #ccc;
+		box-sizing: border-box;
 	}
 	.md-col-items{
 		position: absolute;
@@ -114,6 +110,30 @@
 		}
 	}
 	
+	
+}
+.md-unit{
+	position: absolute;
+	top: 50px;
+	left:0px;
+	width:100%;
+	height:20px;
+	padding:0 10px;
+	box-sizing: border-box;
+
+	.md-col-unit{
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 20px;
+		color: #999;
+		z-index: 4;
+		text-align: center;
+		line-height: 20px;
+		font-size: 16px;
+
+	}
 }
 
 

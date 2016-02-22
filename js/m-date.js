@@ -277,7 +277,7 @@ $(function(){
 		if(typeof month==="undefined"){
 			month = new Date().format('MM')
 		}
-		initCycle('.md-month',month,12,1)
+		initCycle('.md-month',month,12,1,1)
 	}
 	function reInitDay(){
 		var day = getDay(),
@@ -285,7 +285,7 @@ $(function(){
 			year = getYear();
 		var days = util.daysInMonth(month,year);
 		
-		initCycle('.md-day',day,days)
+		initCycle('.md-day',day,days,1)
 	}
 	
 	function initDay(day,month,year){
@@ -302,31 +302,31 @@ $(function(){
 		month = month*1;
 		year = year*1;
 		var days = util.daysInMonth(month,year);
-		initCycle('.md-day',day,days)
+		initCycle('.md-day',day,days,1)
 	}
 	function initHour(hour){
 		if(typeof hour==='undefined'){
 			hour = new Date().format('hh')
 		}
-		initCycle('.md-hour',hour,24)
+		initCycle('.md-hour',hour,24,0)
 	}
 
 	function initMin(min){
 		if(typeof hour==='undefined'){
 			min = new Date().format('mm')
 		}
-		initCycle('.md-min',min,60)
+		initCycle('.md-min',min,60,0)
 	}
 
-	function initCycle(targetHolder,value,cycleLen){
+	function initCycle(targetHolder,value,cycleLen,indexBegin){
 		value = value * 1;
 		var html = '';
 		for(var n=0;n<3;n++){
-			for(var i=0;i<cycleLen;i++){
+			for(var i=0+indexBegin;i<cycleLen+indexBegin;i++){
 				html += '<div class="md-item">'+ util.number2Str(i) +'</div>'
 			}
 		}
-		$(targetHolder).css('top',(3-value-cycleLen)*40);
+		$(targetHolder).css('top',(3+indexBegin-value-cycleLen)*40);
 		$(targetHolder).html(html);
 		$(targetHolder).attr(value);
 	}

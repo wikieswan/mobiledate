@@ -26,6 +26,7 @@
 	util.daysInMonth = daysInMonth;
 	util.cleanStyle = cleanStyle;
 	util.getTargetTopNumber = getTargetTopNumber;
+	util.getRandomId = getRandomId;
 	util.local = {
 		'en' : {
 			cancelText: 'Cancel',
@@ -46,6 +47,7 @@
 			'minute': '分'
 		}
 	}
+
 	function px2number(strpx){
 		var numstr = strpx.replace(/px/,'');
 		return numstr*1;
@@ -72,6 +74,13 @@
 		var top = $(target).css('top');
 		top  = util.px2number(top)
 		return top;
+	}
+	function getRandomId(prex) {
+		if(typeof prex==='undefined'){
+			prex = '';
+		}
+		var str =prex + new Date().getTime() + ''+ Math.round(Math.random(0,1)*10000);
+		return str
 	}
 	/**
 		body coding
@@ -177,6 +186,7 @@
 		}
 
 	})
+	
 	function hasClass(target,cssClass){
 		return $(target).siblings('.md-col-items').hasClass(cssClass)
 	}
@@ -348,7 +358,7 @@
 		}
 		$(targetHolder).css('top',(3+indexBegin-value-cycleLen)*40);
 		$(targetHolder).html(html);
-		$(targetHolder).attr(value);
+		$(targetHolder).attr('val',value);
 	}
 
 	function yPoitoin2Year(y){
@@ -374,6 +384,9 @@
 	function getHour(){
 		return getVal('.md-hour');
 	}
+	function getMin(){
+		return getVal('.md-min');
+	}
 	function getVal(target){
 		return $(target).attr('val')*1;
 	}
@@ -383,6 +396,7 @@
 	$.mdatepicker =  function (ops) {
 		return new mdatepicker(ops)
 	}
+
 	function mdatepicker (ops){
 		var defOps = {
 			mode: 'date',    // date time datetime datemonth
@@ -394,22 +408,107 @@
 			unitVisable: true,
 			local: 'en'
 		}
+		var self = this,
+			text,
+			html;
 		ops = $.extend(defOps,ops)
-		var text = util.local[ops.local]
+		text = util.local[ops.local]
 		ops.okText = ops.okText=='Ok'&&ops.local=='zh'?text.okText:ops.okText
 		ops.cancelText = ops.cancelText=='Cancel'&&ops.local=='zh'?text.cancelText:ops.cancelText
+		
+		html = getDatepickerHtml(ops,text);
 
+		self.ops = ops;
+		self.obj = $(html);
+		
+		$.mdatepickerHandle = {
+			handleCancel: function() {
+				ops.onCancel();
+				self.hide();
+			},
+			handleDateChange: function(){
+				var date = self.val();
+				ops.onDateChange(date)
+				self.hide();
+			}
+		}
+		
+		
+	}
+	mdatepicker.prototype.show = function(){
+		var ops = this.ops,
+			defaultDate = new Date(ops.defaultDate)
+			year = defaultDate.format('yyyy'),
+			month = defaultDate.format('MM'),
+			day = defaultDate.format('dd'),
+			hour = defaultDate.format('hh'),
+			minute = defaultDate.format('mm');
+		
+		this.obj.appendTo('body')
+		if(ops.mode==='date'){
+			initYear(year)
+			initMonth(month)
+			initDay(day)
+		}
+		else if(ops.mode==='time'){
+			initHour(hour)
+			initMin(minute)
+		}
+		else if(ops.mode==='datetime'){
+			initYear(year)
+			initMonth(month)
+			initDay(day)
+			initHour(hour)
+			initMin(minute)
+		}
+		else if(ops.mode==='datemonth'){
+			initYear(year)
+			initMonth(month)
+		}
+		else{
 
-		this.ops = ops;
+		}
+		
+	}
+	mdatepicker.prototype.hide = function(){
+		var self = this;
+		setTimeout(function(){
+			$(self.obj).remove()
+		},300)
+	}
+	mdatepicker.prototype.val = function(){
+		var ops = this.ops,
+			year = getYear(),
+			month = getMonth(),
+			day = getDay(),
+			hour = getHour(),
+			minute = getMin(),
+			date;
 
+		if(ops.mode==='date'){
+			date = year + '/' + month + '/' + day;
+		}
+		else if(ops.mode==='time'){
+			date =  hour + ':' + minute
+		}
+		else if(ops.mode==='datetime'){
+			date = year + '/' + month + '/' + day + ' ' + hour + ':' + minute
+		}
+		else if(ops.mode==='datemonth'){
+			date = year + '/' + month
+		}
+		return date;
+
+	}
+	function getDatepickerHtml(ops,text){
 		var html = '';
 		var bodyHtml = '',
 			unitHtml = '',
 			headHtml='';
 		headHtml = 	
 				'<div class="md-head">\
-					<div class="md-btn md-cancel">'+ops.cancelText+'</div>\
-					<div class="md-btn md-sure">'+ops.okText+'</div>\
+					<div class="md-btn md-cancel" ontouchend="$.mdatepickerHandle.handleCancel()">'+ops.cancelText+'</div>\
+					<div class="md-btn md-sure" ontouchend="$.mdatepickerHandle.handleDateChange()">'+ops.okText+'</div>\
 				</div>'
 		if(ops.mode ==='date'){
 			bodyHtml = 
@@ -552,46 +651,7 @@
 			bodyHtml +
 			'</div>\
 		</div>';
-		
-		this.obj = $(html);
-		
-	}
-	mdatepicker.prototype.show = function(){
-		var ops = this.ops,
-			defaultDate = new Date(ops.defaultDate)
-			year = defaultDate.format('yyyy'),
-			month = defaultDate.format('MM'),
-			day = defaultDate.format('dd'),
-			hour = defaultDate.format('hh'),
-			minute = defaultDate.format('mm');
-
-		this.obj.appendTo('body')
-		if(ops.mode==='date'){
-			initYear(year)
-			initMonth(month)
-			initDay(day)
-		}
-		else if(ops.mode==='time'){
-			initHour(hour)
-			initMin(minute)
-		}
-		else if(ops.mode==='datetime'){
-			initYear(year)
-			initMonth(month)
-			initDay(day)
-			initHour(hour)
-			initMin(minute)
-		}
-		else if(ops.mode==='datemonth'){
-			initYear(year)
-			initMonth(month)
-		}
-		else{
-
-		}
-		
-	}
-	mdatepicker.prototype.hide = function(){
+		return html;
 	}
 
 })(Zepto)

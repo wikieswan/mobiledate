@@ -24,12 +24,22 @@
 <script type="text/javascript" src="/js/m-date-picker.js"></script>
 <script type="text/javascript">
 	var a = $.mdatepicker({
-		mode:'datetime',
-		local: 'zh',
-		unitVisable: true
-
+			mode: 'date',    // date time datetime datemonth
+			defaultDate: '2014/2/1',
+			okText: 'Ok',
+			cancelText: 'Cancel',
+			onDateChange: function(date){
+				console.log(date)
+			},
+			onCancel: function(){
+				
+			},
+			unitVisable: true,
+			local: 'en'
+		})
+	$('.add').click(function(){
+		a.show()
 	})
-	a.show()
 </script>
 
 
